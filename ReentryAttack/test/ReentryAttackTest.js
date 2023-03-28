@@ -1,5 +1,10 @@
 const { expect } = require("chai");
+const toWei = (value) => ethers.utils.parseEther(value.toString());
 
+const fromWei = (value) =>
+    ethers.utils.formatEther(
+        typeof value === "string" ? value : value.toString()
+    );
 
 describe("ReentryAttack", function() {
     let attackC;
@@ -21,10 +26,17 @@ describe("ReentryAttack", function() {
     });
 
     it("Should attack", async () => {
-        await bank.deposit({value: 20});
-        await attackC.attack({value: 1});
+        await bank.deposit({value: toWei(10)});
+        await attackC.attack({value: toWei(1)});
         expect(await bank.getBalance()).to.equal(0);
-        expect(await attackC.getBalance(owner.address)).to.equal(21);
+        expect(await attackC.getBalance()).to.equal(toWei(11));
+    });
+
+    it("Should right", async () => {
+        await bank.deposit({value: toWei(10)});
+        await attackC.attackRight({value: toWei(1)});
+        expect(await bank.getBalance()).to.equal(toWei(10));
+        expect(await attackC.getBalance()).to.equal(toWei(11));
     });
 
 });
