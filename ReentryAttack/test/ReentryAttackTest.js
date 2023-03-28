@@ -13,7 +13,7 @@ describe("ReentryAttack", function() {
     let user;
 
     beforeEach(async () => {
-        const [owner, user] = await ethers.getSigners();
+        [owner, user] = await ethers.getSigners();
         const Bank = await ethers.getContractFactory("Bank");
         bank = await Bank.deploy();
         await bank.deployed();
