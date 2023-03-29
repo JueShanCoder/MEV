@@ -38,5 +38,4 @@ describe("ReentryAttack", function() {
         expect(await bank.getBalance()).to.equal(toWei(10));
         expect(await attackC.getBalance()).to.equal(toWei(11));
     });
-
 });
