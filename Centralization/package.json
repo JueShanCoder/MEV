@@ -1,0 +1,7 @@
+{
+  "name": "hardhat-project",
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.8.2"
+  },
+  "NODE_PATH": "./node_modules"
+}
