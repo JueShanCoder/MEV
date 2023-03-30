@@ -1,0 +1,7 @@
+{
+  "name": "signature-replay-project",
+  "dependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^2.0.2",
+    "@openzeppelin/contracts": "^4.8.2"
+  }
+}
